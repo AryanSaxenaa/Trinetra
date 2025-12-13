@@ -104,39 +104,41 @@ export function HealthInsights() {
                 </div>
 
                 <div className="border-t border-gray-100 pt-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-sm font-medium text-gray-700">Performance Trend</h4>
-                    {trendDirection === 'up' && (
-                      <TrendingUp className="w-5 h-5 text-green-500" />
-                    )}
-                    {trendDirection === 'down' && (
-                      <TrendingDown className="w-5 h-5 text-red-500" />
+                  <div className="bg-gradient-to-b from-gray-900 to-black rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h4 className="text-sm font-medium text-gray-400">Performance Trend</h4>
+                      {trendDirection === 'up' && (
+                        <TrendingUp className="w-5 h-5 text-green-500" />
+                      )}
+                      {trendDirection === 'down' && (
+                        <TrendingDown className="w-5 h-5 text-red-500" />
+                      )}
+                    </div>
+
+                    {component.trend_data && Array.isArray(component.trend_data) && component.trend_data.length > 0 && (
+                      <div>
+                        <div className="flex items-end justify-between h-32 gap-1">
+                          {component.trend_data.map((value, index) => {
+                            const maxValue = Math.max(...(component.trend_data as number[]));
+                            const height = (value / maxValue) * 100;
+
+                            return (
+                              <div key={index} className="flex-1 flex flex-col justify-end">
+                                <div
+                                  className="w-full bg-gradient-to-t from-gray-700 to-gray-600 rounded-t transition-all"
+                                  style={{ height: `${height}%`, minHeight: '8px' }}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="flex justify-between mt-3">
+                          <span className="text-xs text-gray-500">30 days ago</span>
+                          <span className="text-xs text-gray-500">Today</span>
+                        </div>
+                      </div>
                     )}
                   </div>
-
-                  {component.trend_data && Array.isArray(component.trend_data) && component.trend_data.length > 0 && (
-                    <div>
-                      <div className="flex items-end justify-between h-32 gap-1">
-                        {component.trend_data.map((value, index) => {
-                          const maxValue = Math.max(...(component.trend_data as number[]));
-                          const height = (value / maxValue) * 100;
-
-                          return (
-                            <div key={index} className="flex-1 flex flex-col justify-end">
-                              <div
-                                className="w-full bg-gray-800 rounded-t-sm transition-all"
-                                style={{ height: `${height}%`, minHeight: '4px' }}
-                              />
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <div className="flex justify-between mt-2">
-                        <span className="text-xs text-gray-500">30 days ago</span>
-                        <span className="text-xs text-gray-500">Today</span>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
