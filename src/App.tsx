@@ -37,18 +37,18 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="bg-black text-white border-b-4 border-black sticky top-0 z-50">
+    <div className="min-h-screen bg-gray-100">
+      <header className="bg-black text-white sticky top-0 z-50">
         <div className="max-w-[1600px] mx-auto px-6">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-white border-2 border-black flex items-center justify-center mr-3">
-                <span className="text-black text-sm font-black">T</span>
+              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-3">
+                <span className="text-black text-sm font-bold">T</span>
               </div>
-              <h1 className="text-xl font-black uppercase tracking-tight">Trinetra AI</h1>
+              <h1 className="text-xl font-semibold">Trinetra AI</h1>
             </div>
 
-            <nav className="hidden md:flex items-center space-x-2">
+            <nav className="hidden md:flex items-center space-x-1">
               {navigation.map((item) => {
                 const Icon = item.icon;
                 const isActive = currentPage === item.id;
@@ -57,14 +57,14 @@ function App() {
                   <button
                     key={item.id}
                     onClick={() => setCurrentPage(item.id as Page)}
-                    className={`flex items-center px-4 py-2 border-2 transition-all font-bold uppercase text-xs ${
+                    className={`flex items-center px-4 py-2 rounded-lg transition-all ${
                       isActive
-                        ? 'bg-white text-black border-white'
-                        : 'text-white border-white hover:bg-white hover:text-black'
+                        ? 'bg-white text-black font-medium'
+                        : 'text-gray-300 hover:text-white hover:bg-gray-800'
                     }`}
                   >
                     <Icon className="w-4 h-4 mr-2" />
-                    <span>{item.name}</span>
+                    <span className="text-sm">{item.name}</span>
                   </button>
                 );
               })}
@@ -74,7 +74,7 @@ function App() {
               <select
                 value={currentPage}
                 onChange={(e) => setCurrentPage(e.target.value as Page)}
-                className="bg-black text-white px-3 py-2 text-xs font-bold border-2 border-white focus:outline-none uppercase"
+                className="bg-gray-800 text-white px-3 py-2 rounded-lg text-sm border border-gray-700 focus:outline-none focus:border-white"
               >
                 {navigation.map((item) => (
                   <option key={item.id} value={item.id}>
