@@ -7,10 +7,10 @@ const MOCK_RECOMMENDATIONS: MaintenanceRecommendation[] = [
     id: '1',
     vehicle_id: 'TRI-X7',
     title: 'Brake Pad Replacement',
-    description: 'Front brake pads have reached 20% thickness.',
-    urgency: 'high',
+    description: 'Diagnosis Agent predicts 85% probability of premature wear within 800 km.',
+    urgency: 'critical',
     estimated_cost: 350,
-    reasoning: 'Heavy traffic patterns have accelerated wear. Replacement recommended to ensure safety.',
+    reasoning: 'Data Analysis Agent detected increased hydraulic pressure & frequent hard-braking. "Hi Priya, to keep your commute smooth and safe, I recommend a brake check-up. I see you\'re free on Saturday morning—how about 10 AM?"',
     completed: false,
     created_at: new Date().toISOString(),
   },
@@ -96,98 +96,104 @@ export function MaintenanceRecommendations() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-brand-black mb-1">Maintenance Recommendations</h1>
-        <p className="text-gray-500">AI-powered maintenance suggestions for optimal vehicle health</p>
-      </div>
 
-      {recommendations.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 shadow-sm border border-brand-gray-100 text-center">
-          <div className="w-16 h-16 bg-brand-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-8 h-8 text-green-500" />
+
+      <div className="animate-in fade-in duration-500 h-full">
+
+        {recommendations.length === 0 ? (
+          <div className="bg-white rounded-3xl p-12 shadow-sm border border-brand-gray-100 text-center">
+            <div className="w-16 h-16 bg-brand-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-8 h-8 text-green-500" />
+            </div>
+            <h3 className="text-xl font-bold text-brand-black mb-2">All Clear!</h3>
+            <p className="text-gray-500">No maintenance recommendations at this time</p>
           </div>
-          <h3 className="text-xl font-bold text-brand-black mb-2">All Clear!</h3>
-          <p className="text-gray-500">No maintenance recommendations at this time</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {recommendations.map((recommendation) => {
-            const config = urgencyConfig[recommendation.urgency];
-            const Icon = config.icon;
-            const isExpanded = expandedId === recommendation.id;
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
+            {/* Recommendations List */}
+            <div className="lg:col-span-8 space-y-4">
+              {recommendations.map((recommendation) => {
+                const config = urgencyConfig[recommendation.urgency];
+                const Icon = config.icon;
+                const isExpanded = expandedId === recommendation.id;
 
-            return (
-              <div
-                key={recommendation.id}
-                className={`bg-white rounded-3xl p-6 shadow-sm border-2 ${config.borderColor} transition-all hover:shadow-md`}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-start flex-1">
-                    <div className={`w-12 h-12 bg-brand-gray-50 rounded-2xl flex items-center justify-center mr-4 flex-shrink-0`}>
-                      <Icon className={`w-6 h-6 ${config.iconColor}`} />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-lg font-bold text-brand-black">{recommendation.title}</h3>
-                        <span className={`${config.badgeBg} ${config.badgeText} text-[10px] px-2 py-0.5 rounded-full uppercase font-bold tracking-wider`}>
-                          {recommendation.urgency}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-3">{recommendation.description}</p>
+                return (
+                  <div
+                    key={recommendation.id}
+                    className={`bg-white rounded-3xl p-5 shadow-sm border-2 ${config.borderColor} transition-all hover:shadow-md`}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-start flex-1">
+                        <div className={`w-10 h-10 bg-brand-gray-50 rounded-xl flex items-center justify-center mr-4 flex-shrink-0`}>
+                          <Icon className={`w-5 h-5 ${config.iconColor}`} />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-base font-bold text-brand-black">{recommendation.title}</h3>
+                            <span className={`${config.badgeBg} ${config.badgeText} text-[10px] px-2 py-0.5 rounded-full uppercase font-bold tracking-wider`}>
+                              {recommendation.urgency}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-600 mb-2">{recommendation.description}</p>
 
-                      <div className="flex items-center gap-6 text-sm">
-                        <div className="flex items-center">
-                          <span className="text-gray-400 font-bold uppercase text-[10px] mr-2">Est. Cost</span>
-                          <span className="font-bold text-brand-black">${recommendation.estimated_cost}</span>
+                          <div className="flex items-center gap-6 text-xs">
+                            <div className="flex items-center">
+                              <span className="text-gray-400 font-bold uppercase text-[10px] mr-2">Est. Cost</span>
+                              <span className="font-bold text-brand-black">${recommendation.estimated_cost}</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
+
+                    <div className="bg-brand-gray-50 rounded-2xl overflow-hidden">
+                      <button
+                        onClick={() => toggleExpanded(recommendation.id)}
+                        className="w-full px-4 py-2 flex items-center justify-between hover:bg-brand-gray-100 transition-colors"
+                      >
+                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">
+                          Analysis & Reasoning
+                        </span>
+                        {isExpanded ? (
+                          <ChevronUp className="w-3 h-3 text-gray-400" />
+                        ) : (
+                          <ChevronDown className="w-3 h-3 text-gray-400" />
+                        )}
+                      </button>
+
+                      {isExpanded && (
+                        <div className="px-4 pb-4 pt-1 animate-in slide-in-from-top duration-200">
+                          <p className="text-xs text-gray-700 leading-relaxed">{recommendation.reasoning}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Proactive Care Panel */}
+            <div className="lg:col-span-4">
+              <div className="bg-brand-black rounded-3xl p-6 shadow-lg text-white sticky top-4">
+                <h3 className="text-lg font-bold mb-3">Proactive Care</h3>
+                <p className="text-gray-400 leading-relaxed mb-6 text-xs">
+                  Addressing maintenance recommendations proactively can save you up to 40% in long-term repair costs.
+                  Our AI analyzes thousands of data points to predict issues before they become expensive problems.
+                </p>
+                <div className="flex items-center justify-between border-t border-white/10 pt-4">
+                  <div>
+                    <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Potential Savings</p>
+                    <p className="text-xl font-bold">$1,200</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Horizon</p>
+                    <p className="text-xl font-bold">12 Mo</p>
                   </div>
                 </div>
-
-                <div className="bg-brand-gray-50 rounded-2xl overflow-hidden">
-                  <button
-                    onClick={() => toggleExpanded(recommendation.id)}
-                    className="w-full px-5 py-3 flex items-center justify-between hover:bg-brand-gray-100 transition-colors"
-                  >
-                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">
-                      Analysis & Reasoning
-                    </span>
-                    {isExpanded ? (
-                      <ChevronUp className="w-4 h-4 text-gray-400" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-gray-400" />
-                    )}
-                  </button>
-
-                  {isExpanded && (
-                    <div className="px-5 pb-5 pt-1 animate-in slide-in-from-top duration-200">
-                      <p className="text-sm text-gray-700 leading-relaxed">{recommendation.reasoning}</p>
-                    </div>
-                  )}
-                </div>
               </div>
-            );
-          })}
-        </div>
-      )}
-
-      <div className="bg-black rounded-3xl p-8 shadow-lg text-white">
-        <h3 className="text-xl font-bold mb-4">Proactive Care</h3>
-        <p className="text-gray-400 leading-relaxed mb-6 text-sm">
-          Addressing maintenance recommendations proactively can save you up to 40% in long-term repair costs.
-          Our AI analyzes thousands of data points to predict issues before they become expensive problems.
-        </p>
-        <div className="flex items-center justify-between border-t border-white/10 pt-4">
-          <div>
-            <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Potential Savings</p>
-            <p className="text-2xl font-bold">$1,200</p>
+            </div>
           </div>
-          <div className="text-right">
-            <p className="text-[10px] text-gray-500 font-bold uppercase mb-1">Horizon</p>
-            <p className="text-2xl font-bold">12 Mo</p>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

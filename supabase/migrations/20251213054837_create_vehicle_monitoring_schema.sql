@@ -1,5 +1,5 @@
 /*
-  # Trinetra AI Vehicle Monitoring Schema
+  # AntarDrishti AI Vehicle Monitoring Schema
 
   1. New Tables
     - `vehicles`

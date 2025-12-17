@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { LayoutDashboard, Activity, Cloud, Wrench, Calendar, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+import { LayoutDashboard, Activity, Cloud, Wrench, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 
 type Page = 'dashboard' | 'health' | 'context' | 'maintenance' | 'scheduling';
 
@@ -14,11 +14,11 @@ export function Sidebar({ currentPage, setCurrentPage, isOpen, setIsOpen }: Side
     const [collapsed, setCollapsed] = useState(false);
 
     const navigation = [
-        { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard },
-        { id: 'health', name: 'Health Insights', icon: Activity },
-        { id: 'context', name: 'Context Awareness', icon: Cloud },
-        { id: 'maintenance', name: 'Maintenance', icon: Wrench },
-        { id: 'scheduling', name: 'Scheduling', icon: Calendar },
+        { id: 'dashboard', name: 'Vehicle Overview', icon: LayoutDashboard },
+        { id: 'health', name: 'Vehicle Health', icon: Activity },
+        { id: 'context', name: 'Driving Context', icon: Cloud },
+        { id: 'maintenance', name: 'Proactive Maintenance', icon: Wrench },
+        { id: 'scheduling', name: 'Smart Scheduling', icon: Calendar },
     ];
 
     return (
@@ -35,8 +35,8 @@ export function Sidebar({ currentPage, setCurrentPage, isOpen, setIsOpen }: Side
                 className={`fixed top-0 left-0 h-full z-50 transition-all duration-300 ease-in-out border-r border-brand-gray-100 
           ${isOpen ? 'translate-x-0' : '-translate-x-full'} 
           lg:translate-x-0 
-          ${collapsed ? 'lg:w-20' : 'lg:w-72'}
-          bg-brand-black text-white shadow-xl
+          ${collapsed ? 'lg:w-20' : 'lg:w-80'}
+          bg-brand-black text-white shadow-2xl border-r-0
         `}
             >
                 <div className="h-full flex flex-col justify-between relative">
@@ -50,15 +50,15 @@ export function Sidebar({ currentPage, setCurrentPage, isOpen, setIsOpen }: Side
 
                     <div>
                         {/* Header */}
-                        <div className={`p-6 flex items-center ${collapsed ? 'justify-center' : ''} border-b border-white/10`}>
-                            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
-                                <span className="text-brand-black text-xl font-bold tracking-tighter">T</span>
+                        <div className={`p-6 flex items-center ${collapsed ? 'justify-center' : ''} border-b border-white/5`}>
+                            <div className="w-10 h-10 bg-brand-primary rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg shadow-brand-primary/20">
+                                <span className="text-white text-xl font-bold tracking-tighter">A</span>
                             </div>
 
                             {!collapsed && (
-                                <div className="ml-3 transition-opacity animate-in fade-in duration-300">
-                                    <h1 className="text-lg font-medium text-white tracking-tight">Trinetra</h1>
-                                    <p className="text-[10px] text-brand-gray-100/60 uppercase tracking-widest">Enterprise Twin</p>
+                                <div className="ml-5 transition-opacity animate-in fade-in duration-300">
+                                    <h1 className="text-xl font-bold text-white tracking-widest font-heading uppercase">AntarDrishti</h1>
+                                    <p className="text-[10px] text-brand-gray-8 uppercase tracking-[0.3em] font-medium mt-1">Enterprise Twin</p>
                                 </div>
                             )}
                         </div>
@@ -78,17 +78,17 @@ export function Sidebar({ currentPage, setCurrentPage, isOpen, setIsOpen }: Side
                                         }}
                                         className={`
                       w-full flex items-center rounded-lg transition-all duration-200 group relative
-                      ${collapsed ? 'justify-center p-3' : 'px-4 py-3'}
+                      ${collapsed ? 'justify-center p-4' : 'px-6 py-4'}
                       ${isActive
-                                                ? 'bg-white text-brand-black font-medium'
-                                                : 'text-brand-gray-100/70 hover:text-white hover:bg-white/10'}
+                                                ? 'text-white'
+                                                : 'text-brand-gray-8 hover:text-white'}
                     `}
                                     >
 
-                                        <Icon className={`w-5 h-5 ${!collapsed && 'mr-3'}`} strokeWidth={isActive ? 2.5 : 2} />
+                                        <Icon className={`w-5 h-5 ${!collapsed && 'mr-4'} ${isActive ? 'text-brand-primary' : ''}`} strokeWidth={2} />
 
                                         {!collapsed && (
-                                            <span className="text-sm">{item.name}</span>
+                                            <span className="text-xs font-heading font-bold uppercase tracking-[0.25em]">{item.name}</span>
                                         )}
                                     </button>
                                 );
