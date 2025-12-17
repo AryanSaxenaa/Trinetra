@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { LayoutDashboard, Activity, Cloud, Wrench, Calendar, Menu, X } from 'lucide-react';
 import { Dashboard } from './components/Dashboard';
+import { Sidebar } from './components/Sidebar';
 import { HealthInsights } from './components/HealthInsights';
 import { ContextAwareness } from './components/ContextAwareness';
 import { MaintenanceRecommendations } from './components/MaintenanceRecommendations';
@@ -38,84 +39,46 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50 px-4 py-3 flex items-center justify-between">
+    <div className="min-h-screen bg-brand-gray-50 text-brand-black font-sans">
+      {/* Mobile Header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-brand-gray-100 z-50 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center">
-          <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center mr-3">
+          <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center mr-3">
             <span className="text-white text-sm font-bold">T</span>
           </div>
-          <h1 className="text-lg font-light">Trinetra AI</h1>
+          <h1 className="text-lg font-medium text-brand-black tracking-tight">Trinetra</h1>
         </div>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-all"
+          className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-brand-gray-100 transition-all text-brand-black"
         >
           {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
-      <div
-        className={`fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden transition-opacity ${
-          sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
-        onClick={() => setSidebarOpen(false)}
+      <Sidebar
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        isOpen={sidebarOpen}
+        setIsOpen={setSidebarOpen}
       />
 
-      <aside
-        className={`fixed top-0 left-0 h-full w-72 bg-white border-r border-gray-200 z-50 transition-transform duration-300 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0`}
-      >
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center mb-2">
-            <div className="w-10 h-10 bg-gray-900 rounded-xl flex items-center justify-center mr-3">
-              <span className="text-white text-lg font-bold">T</span>
-            </div>
+      {/* Main Content Area */}
+      <main className="lg:pl-20 transition-[padding] duration-300 pt-16 lg:pt-0 min-h-screen relative overflow-hidden">
+
+        <div className="relative z-10 p-6 lg:p-10 max-w-7xl mx-auto">
+          {/* Breadcrumb / Page Title */}
+          <div className="mb-8 flex items-end justify-between">
             <div>
-              <h1 className="text-xl font-light text-gray-900">Trinetra AI</h1>
-              <p className="text-xs text-gray-500">Digital Twin with a Conscience</p>
+              <h2 className="text-3xl font-bold text-brand-black mb-1 tracking-tight">{navigation.find(n => n.id === currentPage)?.name}</h2>
+              <div className="h-1 w-12 bg-black" />
+            </div>
+            <div className="hidden md:flex text-xs font-medium text-gray-400 space-x-4">
+              <span>SYS.UPTIME: 99.9%</span>
+              <span>NETWORK: SECURE</span>
             </div>
           </div>
-        </div>
 
-        <nav className="p-4">
-          {navigation.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentPage === item.id;
-
-            return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  setCurrentPage(item.id as Page);
-                  setSidebarOpen(false);
-                }}
-                className={`w-full flex items-center px-4 py-3 rounded-2xl mb-2 transition-all ${
-                  isActive
-                    ? 'bg-gray-900 text-white shadow-lg'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <Icon className="w-5 h-5 mr-3" />
-                <span className="font-medium">{item.name}</span>
-              </button>
-            );
-          })}
-        </nav>
-
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-4 text-white">
-            <p className="text-xs font-medium mb-1">AI Status</p>
-            <div className="flex items-center">
-              <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse" />
-              <span className="text-sm">Active & Monitoring</span>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      <main className="lg:ml-72 pt-16 lg:pt-0">
-        <div className="p-6 lg:p-8">
           {renderPage()}
         </div>
       </main>

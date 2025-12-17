@@ -1,142 +1,80 @@
-import { useEffect, useState } from 'react';
-import { AlertCircle, CheckCircle, XCircle } from 'lucide-react';
-import { supabase, ComponentHealth } from '../lib/supabase';
+import React from 'react';
+import { Activity, Heart, Thermometer, Wind, AlertCircle } from 'lucide-react';
 
 export function HealthInsights() {
-  const [components, setComponents] = useState<ComponentHealth[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadComponents();
-  }, []);
-
-  async function loadComponents() {
-    try {
-      const { data } = await supabase
-        .from('component_health')
-        .select('*')
-        .order('health_score', { ascending: true });
-
-      if (data) {
-        setComponents(data);
-      }
-    } catch (error) {
-      console.error('Error loading components:', error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-400">Loading...</div>
-      </div>
-    );
-  }
-
-  const statusConfig = {
-    good: {
-      icon: CheckCircle,
-      color: 'text-green-500',
-      bg: 'bg-green-50',
-      border: 'border-green-200',
-    },
-    warning: {
-      icon: AlertCircle,
-      color: 'text-yellow-500',
-      bg: 'bg-yellow-50',
-      border: 'border-yellow-200',
-    },
-    critical: {
-      icon: XCircle,
-      color: 'text-red-500',
-      bg: 'bg-red-50',
-      border: 'border-red-200',
-    },
-  };
-
   return (
-    <div className="space-y-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-light text-gray-900 mb-2">Health Insights</h1>
-        <p className="text-gray-500">Detailed component analysis and trends</p>
-      </div>
+    <div className="space-y-6 animate-in fade-in duration-700">
+      <div className="bg-white p-8 rounded-3xl relative overflow-hidden shadow-sm border border-brand-gray-100">
+        <div className="absolute top-0 right-0 p-4 opacity-10">
+          <Activity size={100} className="text-black" />
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {components.map((component) => {
-          const config = statusConfig[component.status];
-          const Icon = config.icon;
+        <h2 className="text-2xl font-bold text-brand-black mb-2 tracking-tight">Vehicle Wellness Score</h2>
+        <div className="flex items-end space-x-4 mb-8">
+          <span className="text-6xl font-black text-brand-black tracking-tighter">
+            94
+          </span>
+          <span className="text-sm font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full mb-2">▲ 2.5% vs Last Week</span>
+        </div>
 
-          return (
-            <div
-              key={component.id}
-              className={`bg-white rounded-3xl p-6 shadow-lg border-2 ${config.border} transition-all hover:shadow-xl`}
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center">
-                  <div className={`w-12 h-12 ${config.bg} rounded-2xl flex items-center justify-center mr-4`}>
-                    <Icon className={`w-6 h-6 ${config.color}`} />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900">{component.component_name}</h3>
-                    <p className="text-sm text-gray-500 capitalize">{component.status}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-light text-gray-900">{component.health_score}</div>
-                  <div className="text-xs text-gray-400">Score</div>
-                </div>
-              </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Radar Chart Placeholder */}
+          <div className="aspect-square bg-brand-gray-50 rounded-2xl flex items-center justify-center relative border border-brand-gray-100">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-[80%] h-[80%] border border-brand-gray-200 rounded-full" />
+              <div className="absolute w-[60%] h-[60%] border border-brand-gray-200 rounded-full" />
+              <div className="absolute w-[40%] h-[40%] border border-brand-gray-200 rounded-full" />
 
-              <div className="mb-4">
-                <div className="flex justify-between text-xs text-gray-500 mb-1">
-                  <span>Health Status</span>
-                  <span>{component.health_score}%</span>
+              <div className="absolute w-[70%] h-[70%] bg-black/5 rotate-45 skew-x-12 border border-black/10" />
+            </div>
+            <span className="relative z-10 text-[10px] font-bold tracking-widest text-center text-brand-gray-800 uppercase">
+              Multi-Point<br />Analysis
+            </span>
+          </div>
+
+          <div className="md:col-span-2 space-y-5">
+            {[
+              { label: 'Powertrain Efficiency', value: 98, color: 'bg-green-500' },
+              { label: 'Braking System', value: 92, color: 'bg-black' },
+              { label: 'Electrical/Battery', value: 85, color: 'bg-gray-600' },
+              { label: 'Suspension Integrity', value: 96, color: 'bg-gray-400' },
+            ].map((metric) => (
+              <div key={metric.label}>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-brand-gray-800 font-medium">{metric.label}</span>
+                  <span className="text-brand-black font-bold">{metric.value}%</span>
                 </div>
-                <div className="w-full bg-gray-100 rounded-full h-2">
+                <div className="h-2 bg-brand-gray-100 rounded-full overflow-hidden">
                   <div
-                    className={`h-2 rounded-full transition-all duration-500 ${
-                      component.status === 'good'
-                        ? 'bg-green-500'
-                        : component.status === 'warning'
-                        ? 'bg-yellow-500'
-                        : 'bg-red-500'
-                    }`}
-                    style={{ width: `${component.health_score}%` }}
+                    className={`h-full ${metric.color} rounded-full transition-all duration-1000 ease-out`}
+                    style={{ width: `${metric.value}%` }}
                   />
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
-              {component.trend_data && Array.isArray(component.trend_data) && component.trend_data.length > 0 && (
-                <div className="mb-4">
-                  <p className="text-xs text-gray-500 mb-2">Trend (Last 7 Days)</p>
-                  <div className="flex items-end justify-between h-16 gap-1">
-                    {component.trend_data.map((value, index) => (
-                      <div key={index} className="flex-1 flex flex-col justify-end">
-                        <div
-                          className={`w-full rounded-t transition-all ${
-                            value >= 80
-                              ? 'bg-green-400'
-                              : value >= 60
-                              ? 'bg-yellow-400'
-                              : 'bg-red-400'
-                          }`}
-                          style={{ height: `${value}%` }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className={`${config.bg} rounded-2xl p-4 border ${config.border}`}>
-                <p className="text-xs font-medium text-gray-700 mb-1">Analysis</p>
-                <p className="text-sm text-gray-600">{component.reason}</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {[
+          { title: 'Engine Temp', value: '195°F', status: 'Normal', icon: Thermometer },
+          { title: 'Intake Pressure', value: '14.2 PSI', status: 'Optimal', icon: Wind },
+          { title: 'Oil Quality', value: 'Good', status: 'Change in 3k mi', icon: Heart },
+        ].map((card, i) => (
+          <div key={i} className="bg-white p-5 rounded-2xl flex items-start space-x-4 hover:shadow-md transition-shadow border border-brand-gray-100">
+            <div className="p-3 bg-brand-gray-50 rounded-xl text-brand-black">
+              <card.icon size={24} />
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 font-bold uppercase tracking-wide">{card.title}</p>
+              <p className="text-xl font-bold text-brand-black my-1">{card.value}</p>
+              <div className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-green-100 text-green-700">
+                {card.status}
               </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </div>
   );

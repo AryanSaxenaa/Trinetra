@@ -1,182 +1,129 @@
-import { useEffect, useState } from 'react';
-import { Activity, Battery, Gauge, TrendingUp } from 'lucide-react';
-import { supabase, Vehicle, VehicleHealthMetrics } from '../lib/supabase';
+import React from 'react';
+import { Scene } from './3d/Scene';
+import { Activity, Battery, Zap, AlertTriangle, ShieldCheck, Clock, Calendar } from 'lucide-react';
+
+/*
+  Dashboard for Trinetra - AntarDrishti
+  Features:
+  - 3D Digital Twin (Scene)
+  - Real-time vehicle telematics
+*/
 
 export function Dashboard() {
-  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
-  const [metrics, setMetrics] = useState<VehicleHealthMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  async function loadData() {
-    try {
-      const { data: vehicleData } = await supabase
-        .from('vehicles')
-        .select('*')
-        .limit(1)
-        .maybeSingle();
-
-      if (vehicleData) {
-        setVehicle(vehicleData);
-
-        const { data: metricsData } = await supabase
-          .from('vehicle_health_metrics')
-          .select('*')
-          .eq('vehicle_id', vehicleData.id)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        setMetrics(metricsData);
-      }
-    } catch (error) {
-      console.error('Error loading data:', error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-400">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!vehicle || !metrics) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-400">No vehicle data available</div>
-      </div>
-    );
-  }
-
-  const statusColors = {
-    'Healthy': 'bg-green-500',
-    'Needs Attention': 'bg-yellow-500',
-    'Service Required': 'bg-red-500',
-  };
-
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col lg:flex-row gap-6">
-        <div className="flex-1 bg-white rounded-3xl p-8 shadow-lg">
-          <div className="flex flex-col items-center">
-            <h2 className="text-2xl font-light text-gray-800 mb-8">Vehicle Wellness</h2>
+    <div className="space-y-6 animate-in fade-in duration-700 pb-10">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main 3D Display - Takes up 2 columns on large screens */}
+        <div className="lg:col-span-2 relative">
+          <Scene />
 
-            <div className="relative w-64 h-64 mb-6">
-              <svg className="w-full h-full transform -rotate-90">
-                <circle
-                  cx="128"
-                  cy="128"
-                  r="112"
-                  stroke="#f0f0f0"
-                  strokeWidth="16"
-                  fill="none"
-                />
-                <circle
-                  cx="128"
-                  cy="128"
-                  r="112"
-                  stroke={vehicle.wellness_score >= 80 ? '#10b981' : vehicle.wellness_score >= 60 ? '#f59e0b' : '#ef4444'}
-                  strokeWidth="16"
-                  fill="none"
-                  strokeDasharray={`${2 * Math.PI * 112}`}
-                  strokeDashoffset={`${2 * Math.PI * 112 * (1 - vehicle.wellness_score / 100)}`}
-                  strokeLinecap="round"
-                  className="transition-all duration-1000"
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-6xl font-light text-gray-900">{vehicle.wellness_score}</span>
-                <span className="text-gray-500 text-sm">out of 100</span>
-              </div>
-            </div>
-
-            <div className={`inline-flex items-center px-6 py-2 rounded-full ${statusColors[vehicle.status as keyof typeof statusColors]} bg-opacity-10`}>
-              <span className={`w-2 h-2 rounded-full ${statusColors[vehicle.status as keyof typeof statusColors]} mr-2`}></span>
-              <span className="text-sm font-medium text-gray-900">{vehicle.status}</span>
-            </div>
-
-            <div className="mt-8 w-full">
-              <p className="text-sm text-gray-600 mb-2">{vehicle.name}</p>
-              <p className="text-xs text-gray-400">{vehicle.model} • {vehicle.year}</p>
-            </div>
+          {/* Overlay controls or info if needed */}
+          <div className="absolute top-4 right-4 flex space-x-2">
+            <span className="px-2 py-1 rounded bg-white shadow-sm text-xs text-brand-black font-medium">
+              LIVE
+            </span>
+            <span className="px-2 py-1 rounded bg-white shadow-sm text-xs text-brand-gray-800">
+              12ms
+            </span>
           </div>
         </div>
 
-        <div className="flex-1 space-y-4">
-          <div className="bg-white rounded-3xl p-6 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center mr-4">
-                  <Gauge className="w-6 h-6 text-gray-700" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Mileage</p>
-                  <p className="text-2xl font-light text-gray-900">{vehicle.mileage.toLocaleString()}</p>
-                </div>
-              </div>
-              <span className="text-xs text-gray-400">km</span>
-            </div>
-          </div>
+        {/* Real-time Status Panel */}
+        <div className="space-y-4">
+          <div className="bg-white p-6 rounded-3xl h-full flex flex-col justify-between shadow-sm border border-brand-gray-100 min-h-[500px]">
 
-          <div className="bg-white rounded-3xl p-6 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center mr-4">
-                  <Battery className="w-6 h-6 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Battery Health</p>
-                  <p className="text-2xl font-light text-gray-900">{metrics.battery_health}%</p>
-                </div>
-              </div>
-              <TrendingUp className="w-4 h-4 text-green-500" />
-            </div>
-          </div>
+            <div>
+              <h2 className="text-2xl font-bold mb-1 text-brand-black tracking-tight">Status Report</h2>
+              <p className="text-brand-gray-800/60 text-sm mb-8">ID: TRI-2025-X7</p>
 
-          <div className="bg-white rounded-3xl p-6 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center mr-4">
-                  <Activity className="w-6 h-6 text-blue-600" />
+              <div className="space-y-4">
+                <div className="p-4 rounded-xl bg-brand-gray-50 border border-brand-gray-100">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center">
+                      <div className="p-2 rounded-lg bg-black text-white mr-3">
+                        <ShieldCheck size={18} />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 font-medium uppercase">System Health</p>
+                        <p className="font-bold text-brand-black">98.5%</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-black w-[98.5%]" />
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Engine Wear</p>
-                  <p className="text-2xl font-light text-gray-900">{metrics.engine_wear}%</p>
-                </div>
-              </div>
-              <span className={`text-xs ${metrics.engine_wear < 30 ? 'text-green-500' : metrics.engine_wear < 60 ? 'text-yellow-500' : 'text-red-500'}`}>
-                {metrics.engine_wear < 30 ? 'Excellent' : metrics.engine_wear < 60 ? 'Good' : 'Check'}
-              </span>
-            </div>
-          </div>
 
-          <div className="bg-white rounded-3xl p-6 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center mr-4">
-                  <svg className="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <circle cx="12" cy="12" r="9" strokeWidth="2" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 7v5l3 3" />
-                  </svg>
+                <div className="p-4 rounded-xl bg-brand-gray-50 border border-brand-gray-100">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center">
+                      <div className="p-2 rounded-lg bg-black text-white mr-3">
+                        <Battery size={18} />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 font-medium uppercase">Battery Level</p>
+                        <p className="font-bold text-brand-black">87%</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-black w-[87%]" />
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Tire Wear</p>
-                  <p className="text-2xl font-light text-gray-900">{metrics.tire_wear}%</p>
+
+                <div className="p-4 rounded-xl bg-brand-gray-50 border border-brand-gray-100">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="p-2 rounded-lg bg-black text-white mr-3">
+                        <Clock size={18} />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 font-medium uppercase">MTBF Prediction</p>
+                        <p className="font-bold text-brand-black">2,450 Hrs</p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full">+15%</span>
+                  </div>
                 </div>
               </div>
-              <span className={`text-xs ${metrics.tire_wear < 40 ? 'text-green-500' : metrics.tire_wear < 70 ? 'text-yellow-500' : 'text-red-500'}`}>
-                {metrics.tire_wear < 40 ? 'Excellent' : metrics.tire_wear < 70 ? 'Monitor' : 'Replace'}
-              </span>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-brand-gray-100">
+              <div className="flex justify-between items-end">
+                <div>
+                  <p className="text-xs text-gray-400 mb-1 flex items-center font-medium">
+                    <Calendar size={12} className="mr-1" /> NEXT MAINTENANCE
+                  </p>
+                  <p className="text-lg text-brand-black font-bold">In 14 Days</p>
+                </div>
+                <button className="px-5 py-2.5 rounded-lg bg-black text-white hover:bg-gray-800 transition-all text-sm font-medium shadow-lg shadow-black/20">
+                  Schedule
+                </button>
+              </div>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Grid of secondary metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: 'Tire Pressure', value: '32 PSI', icon: Zap },
+          { label: 'Oil Life', value: '68%', icon: Activity },
+          { label: 'Brake Pads', value: 'Good', icon: ShieldCheck },
+          { label: 'Active Alerts', value: '0 Active', icon: AlertTriangle },
+        ].map((stat, i) => (
+          <div key={i} className="bg-white p-5 rounded-2xl border border-brand-gray-100 shadow-sm hover:shadow-md transition-all group">
+            <div className="flex justify-between items-start mb-3">
+              <div className={`p-2 rounded-lg bg-brand-gray-50 text-brand-black group-hover:bg-black group-hover:text-white transition-colors duration-300`}>
+                <stat.icon size={18} />
+              </div>
+              <span className="text-[10px] text-gray-400 font-mono">SENSOR_{i + 1}</span>
+            </div>
+            <p className="text-2xl font-bold text-brand-black mb-1">{stat.value}</p>
+            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{stat.label}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
